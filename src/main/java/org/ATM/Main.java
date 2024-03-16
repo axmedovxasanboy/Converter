@@ -4,12 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
@@ -39,8 +37,6 @@ public class Main {
             Gson gson = new Gson();
             List<Currency> currencies = gson.fromJson(resp.body(), type);
 
-            // currencies.forEach(System.out::println);
-
             currencies.sort(Comparator.comparing(Currency::getCcyNm_UZ));
             StringBuilder currencyInfo = new StringBuilder();
             StringBuilder popularCurInfo = new StringBuilder();
@@ -64,48 +60,80 @@ public class Main {
 
             System.out.println(currencyInfo);
             System.out.printf("Popular currencies\n%s", popularCurInfo);
-            System.out.print("Insert id of currency: ");
-            String idHolder = scanner.nextLine();
-            if (isValid(idHolder)) return;
-
-            int id = Integer.parseInt(idHolder);
-            currencyInfo = new StringBuilder();
-            for (Currency c : currencies) {
-                if (c.getId().equals(id)) {
-                    currencyInfo.append(c.getId()).append(". ")
-                            .append(c.getCcyNm_UZ())
-                            .append(" (").append(c.getRate()).append(")");
-                    chosen = c;
-                    break;
+            String breaker = "";
+            System.out.println("-1. Stop the program");
+            do {
+                System.out.print("Insert id of currency: ");
+                String idHolder = scanner.nextLine();
+                if (idHolder.equals("-1")) {
+                    breaker = "-1";
+                    continue;
                 }
-            }
+                if (isValid(idHolder)) {
+                    breaker = "0";
+                    continue;
+                }
+
+                int id = Integer.parseInt(idHolder);
+                currencyInfo = new StringBuilder();
+                for (Currency c : currencies) {
+                    if (c.getId().equals(id)) {
+                        currencyInfo.append(c.getId()).append(". ")
+                                .append(c.getCcyNm_UZ())
+                                .append(" (").append(c.getRate()).append(")");
+                        chosen = c;
+                        break;
+                    }
+                }
+
+                if (chosen.getId() == null) {
+                    System.out.println("Invalid id inserted");
+                    breaker = "0";
+                }
+
+
+            } while (!breaker.equals("-1"));
+
+
             System.out.println(currencyInfo);
-            System.out.print("Insert amount of money: ");
-            String moneyHolder = scanner.nextLine();
-            if (isValid(moneyHolder)) return;
+            breaker = "";
+            System.out.println("-1. Stop the program");
+            String moneyHolder;
+
+            do {
+                System.out.print("Insert amount of money: ");
+                moneyHolder = scanner.nextLine();
+                if (moneyHolder.equals("-1")) {
+                    breaker = "-1";
+                    continue;
+                }
+                if (isValid(moneyHolder)) {
+                    breaker = "0";
+                }
 
 
-            Double money = Double.parseDouble(moneyHolder);
-            System.out.println(money);
-            System.out.println(Double.parseDouble(chosen.getRate()));
-//            Oldin / bilan bolish
-//            Keyin % bilan qoldiqni olib yaxlitlash
-
-            System.out.println(Math.round((money / Double.parseDouble(chosen.getRate()))*100)/100);
-
-//            BigDecimal money1 = new BigDecimal(money);
-//            money1.setScale(2, )
+            } while (!breaker.equals("-1"));
 
 
-            System.out.println("You can get " + (money / Double.parseDouble(chosen.getRate())) + " " + chosen.getCcyNm_EN() + "(s)");
+            double inserted = Double.parseDouble(moneyHolder);
+            double rate = Double.parseDouble(chosen.getRate());
+            double holder = inserted / rate;
+            String exchanged = String.valueOf(holder);
+            int index = exchanged.indexOf(".");
+            StringBuilder answer = new StringBuilder("You can get ");
 
-
+            if (exchanged.substring(index + 1).length() == 1) {
+                answer.append(exchanged);
+            } else if (exchanged.startsWith("000", index + 1)) {
+                answer.append(exchanged, 0, index);
+            } else {
+                answer.append(exchanged, 0, index + 4);
+            }
+            answer.append(" ").append(chosen.getCcyNm_EN()).append("(s)");
+            System.out.println(answer);
         } catch (Exception e) {
-//            e.printStackTrace();
-            System.out.println(e.getMessage());
+            System.out.println("Error occurred\n" + e.getMessage());
         }
-
-
     }
 
     private static boolean isValid(String holder) {

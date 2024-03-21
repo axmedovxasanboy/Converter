@@ -1,4 +1,4 @@
-package org.ATM;
+package org.CurrencyBot.db;
 
 import lombok.Getter;
 import lombok.Setter;

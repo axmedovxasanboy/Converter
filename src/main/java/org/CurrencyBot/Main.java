@@ -1,7 +1,8 @@
-package org.ATM;
+package org.CurrencyBot;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.CurrencyBot.db.Currency;
 
 import java.lang.reflect.Type;
 import java.net.URI;

@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static org.CurrencyBot.db.Instances.db;
+
 public class App {
     public static void main(String[] args) {
         ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -21,7 +23,15 @@ public class App {
             System.out.println(e.getMessage());
         }
 
-        if (answer != null && answer.startsWith("Error")) {
+        if (answer != null) {
+            if (answer.startsWith("Error")) {
+                System.out.println("Error occurred while getting currencies");
+            } else {
+                String[] split = answer.split("<popular>");
+                db.setCurrency(split[0]);
+                db.setPopularCurrency(split[1]);
+                System.out.println(db);
+            }
 
         }
 

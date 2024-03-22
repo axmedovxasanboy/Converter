@@ -26,10 +26,10 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return Props.get("bot.username");
+        return Props.get("bot.username", "resources/bot.properties");
     }
 
     public String getBotToken() {
-        return Props.get("bot.token");
+        return Props.get("bot.token", "resources/bot.properties");
     }
 }

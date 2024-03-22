@@ -16,14 +16,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static org.CurrencyBot.db.Instances.db;
+
 public class ReadCurrencies implements Callable<String> {
     @Override
     public String call() {
         Gson gson = new Gson();
-        Database db = new Database();
         StringBuilder currencyInfo = new StringBuilder(), popularCurInfo = new StringBuilder();
 
-        String api = Props.get("api");
+        String api = Props.get("api", "resources/currency.properties");
         HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request;
 
@@ -67,6 +68,6 @@ public class ReadCurrencies implements Callable<String> {
                     append(" (").append(currency.getRate()).append(")").
                     append("\n");
         }
-        return currencyInfo + "|popular>" + popularCurInfo;
+        return currencyInfo + "<popular>" + popularCurInfo;
     }
 }

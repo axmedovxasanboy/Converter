@@ -1,8 +1,8 @@
-package org.CurrencyBot.bot;
+package bot;
 
-import org.CurrencyBot.handlers.BaseHandler;
-import org.CurrencyBot.handlers.CallbackHandler;
-import org.CurrencyBot.handlers.MessageHandler;
+import handlers.BaseHandler;
+import handlers.CallbackHandler;
+import handlers.MessageHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 

@@ -1,8 +1,7 @@
-package org.CurrencyBot.db;
+package db;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.CurrencyBot.db.Database;
 
 @Getter
 @Setter

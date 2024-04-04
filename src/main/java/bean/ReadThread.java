@@ -1,9 +1,8 @@
-package org.CurrencyBot.bot;
+package bean;
 
+import bot.Props;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.CurrencyBot.db.Currency;
-import org.CurrencyBot.db.Database;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -14,13 +13,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Callable;
 
-import static org.CurrencyBot.db.Instances.db;
+import static db.Instances.db;
 
-public class ReadCurrencies implements Callable<String> {
+public class ReadThread implements Runnable {
     @Override
-    public String call() {
+    public void run() {
         Gson gson = new Gson();
         StringBuilder currencyInfo = new StringBuilder(), popularCurInfo = new StringBuilder();
 
@@ -34,21 +32,26 @@ public class ReadCurrencies implements Callable<String> {
                         .uri(new URI(api))
                         .GET()
                         .build();
-            } else return "Error (api=null)";
+            } else {
+                db.setCurrency("Error (api=null)");
+                return;
+            }
         } catch (URISyntaxException e) {
-            return "Error (in request) " + e.getMessage();
+            db.setCurrency("Error (in request) " + e.getMessage());
+            return;
         }
 
         HttpResponse<String> resp;
         try {
             resp = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            return "Error (in response) " + e.getMessage();
+            db.setCurrency("Error (in request) " + e.getMessage());
+            return;
         }
         Type type = TypeToken.getParameterized(List.class, Currency.class).getType();
 
         List<Currency> currencies = gson.fromJson(resp.body(), type);
-        currencies.sort(Comparator.comparing(Currency::getCcyNm_UZ));
+        currencies.sort(Comparator.comparing(Currency::getUZ));
         db.setCurrencies(currencies);
 
         int[] popularCurId = {1, 13, 14, 15, 21, 22, 37, 57, 69, 73};
@@ -57,17 +60,18 @@ public class ReadCurrencies implements Callable<String> {
                 if (currency.getId().equals(id)) {
                     popularCurInfo.append(currency.getId()).
                             append(". ").
-                            append(currency.getCcyNm_UZ()).
+                            append(currency.getUZ()).
                             append(" (").append(currency.getRate()).append(")").
                             append("\n");
                 }
             }
             currencyInfo.append(currency.getId()).
                     append(". ").
-                    append(currency.getCcyNm_UZ()).
+                    append(currency.getUZ()).
                     append(" (").append(currency.getRate()).append(")").
                     append("\n");
         }
-        return currencyInfo + "<popular>" + popularCurInfo;
+        db.setCurrency(String.valueOf(currencyInfo));
+        db.setPopularCurrency(String.valueOf(popularCurInfo));
     }
 }

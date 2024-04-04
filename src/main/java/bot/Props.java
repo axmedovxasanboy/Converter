@@ -1,4 +1,4 @@
-package org.CurrencyBot.bot;
+package bot;
 
 import java.io.FileInputStream;
 import java.io.IOException;
